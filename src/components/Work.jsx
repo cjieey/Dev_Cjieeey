@@ -4,6 +4,7 @@ import styles from './Work.module.css'
 
 export default function Work() {
   const [projects, setProjects] = useState(DEFAULT_PROJECTS)
+  const [activeProject, setActiveProject] = useState(null)
 
   useEffect(() => {
     try {
@@ -33,10 +34,13 @@ export default function Work() {
             <a
               key={p.id}
               href={p.url || '#work'}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveProject(p);
+                document.body.style.overflow = 'hidden';
+              }}
               className={`${styles.card} ${p.featured ? styles.wide : ''} reveal`}
               style={{ '--d': `${i * 60}ms` }}
-              target={p.url?.startsWith('http') ? '_blank' : undefined}
-              rel={p.url?.startsWith('http') ? 'noopener' : undefined}
             >
               {p.image
                 ? <img src={p.image} alt={p.name} className={styles.cardImg} />
@@ -56,6 +60,31 @@ export default function Work() {
           ))}
         </div>
       </div>
+      {activeProject && (
+        <div className={styles.modalOverlay} onClick={() => { setActiveProject(null); document.body.style.overflow = ''; }}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <button className={styles.closeBtn} onClick={() => { setActiveProject(null); document.body.style.overflow = ''; }}>×</button>
+            {activeProject.image
+              ? <img src={activeProject.image} alt={activeProject.name} className={styles.modalImg} />
+              : <div className={styles.modalGrad} style={{ background: activeProject.gradient }} aria-hidden="true" />
+            }
+            <div className={styles.modalBody}>
+              <h3 className={styles.modalName}>{activeProject.name}</h3>
+              <p className={styles.tags}>
+                {activeProject.tags.map((t, ti) => (
+                  <span key={ti} className={ti === 0 ? styles.tagBold : ''}>{t}</span>
+                ))}
+              </p>
+              <p className={styles.modalDesc}>{activeProject.desc}</p>
+              {activeProject.url && activeProject.url !== '#work' && (
+                <a href={activeProject.url} target="_blank" rel="noopener noreferrer" className={styles.modalLink}>
+                  Visit Project →
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

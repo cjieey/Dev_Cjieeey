@@ -33,9 +33,14 @@ export default function Admin() {
   }, [])
 
   const save = (list) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
-    setProjects(list)
-    setSaved(true); setTimeout(() => setSaved(false), 2000)
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
+      setProjects(list)
+      setSaved(true); setTimeout(() => setSaved(false), 2000)
+    } catch (e) {
+      alert("Error saving: Storage limit reached! The image might be too large.")
+      console.error(e)
+    }
   }
 
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }))
@@ -44,7 +49,20 @@ export default function Admin() {
     const file = e.target.files[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = ev => { setForm(f => ({ ...f, image: ev.target.result })); setPreview(ev.target.result) }
+    reader.onload = ev => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        let { width, height } = img
+        if (width > 1200) { height = Math.round(height * 1200 / width); width = 1200 }
+        canvas.width = width; canvas.height = height
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, width, height)
+        const compressed = canvas.toDataURL('image/webp', 0.8)
+        setForm(f => ({ ...f, image: compressed })); setPreview(compressed)
+      }
+      img.src = ev.target.result
+    }
     reader.readAsDataURL(file)
   }
 
