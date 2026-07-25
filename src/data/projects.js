@@ -1,52 +1,69 @@
 export const DEFAULT_PROJECTS = [
   {
-    id: 'evecurls',
-    name: 'Evecurls — E-commerce Data Automation',
-    tags: ['Latest', 'E-commerce', 'Business Intelligence', 'Automation'],
-    desc: 'Centralised e-commerce dashboards and workflow automations integrating Shopify, BigQuery, and Gorgias. KPI tiles for gross sales, marketing ROAS, support SLA, and low-stock alerts, fed by a five-source API sync hub.',
-    url: '#work',
-    image: null,
-    gradient: 'linear-gradient(135deg,#7048e8 0%,#5c7cfa 100%)',
-    featured: true,
+    "id": "evecurls",
+    "name": "Evecurls — E-commerce Data Automation",
+    "tags": [
+      "Latest",
+      "E-commerce",
+      "Business Intelligence",
+      "Automation"
+    ],
+    "desc": "Centralised e-commerce dashboards and workflow automations integrating Shopify, BigQuery, and Gorgias. KPI tiles for gross sales, marketing ROAS, support SLA, and low-stock alerts, fed by a five-source API sync hub.",
+    "url": "#work",
+    "image": "/images/evecurls.webp",
+    "gradient": "linear-gradient(135deg,#7048e8 0%,#5c7cfa 100%)",
+    "featured": true
   },
   {
-    id: 'gcc-ai',
-    name: 'GCC AI Smart Companion',
-    tags: ['Capstone', 'AI'],
-    desc: 'A conversational AI agent built with Laravel and the Groq API. Features persistent chat history, context awareness, and a clean responsive interface with personalised user sessions.',
-    url: '#work',
-    image: null,
-    gradient: 'linear-gradient(135deg,#ff6b6b 0%,#c92a2a 100%)',
-    featured: false,
+    "id": "gcc-ai",
+    "name": "GCC AI Smart Companion",
+    "tags": [
+      "Capstone",
+      "AI"
+    ],
+    "desc": "A conversational AI agent built with Laravel and the Groq API. Features persistent chat history, context awareness, and a clean responsive interface with personalised user sessions.",
+    "url": "#work",
+    "image": "/images/gcc-ai.webp",
+    "gradient": "linear-gradient(135deg,#ff6b6b 0%,#c92a2a 100%)",
+    "featured": false
   },
   {
-    id: 'medisync',
-    name: 'Medisync — ICU System',
-    tags: ['Healthcare', 'Laravel'],
-    desc: 'ICU patient management system with secure role-based access, real-time vital tracking dashboard, and admission/discharge/transfer workflows with full audit logging.',
-    url: '#work',
-    image: null,
-    gradient: 'linear-gradient(135deg,#4dabf7 0%,#1971c2 100%)',
-    featured: false,
+    "id": "medisync",
+    "name": "Medisync — ICU System",
+    "tags": [
+      "Healthcare",
+      "Laravel"
+    ],
+    "desc": "ICU patient management system with secure role-based access, real-time vital tracking dashboard, and admission/discharge/transfer workflows with full audit logging.",
+    "url": "#work",
+    "image": "/images/medisync.webp",
+    "gradient": "linear-gradient(135deg,#4dabf7 0%,#1971c2 100%)",
+    "featured": false
   },
   {
-    id: 'arduino',
-    name: 'Arduino Uno Contest — 2nd Place',
-    tags: ['Award', 'Arduino'],
-    desc: 'Represented Gingoog City Comprehensive NHS at Christ the King College — secured 2nd Place out of 12 regional schools in a two-hour timed hardware programming build.',
-    url: '#work',
-    image: null,
-    gradient: 'linear-gradient(135deg,#ffd43b 0%,#f08c00 100%)',
-    featured: false,
+    "id": "arduino",
+    "name": "Arduino Uno Contest — 2nd Place",
+    "tags": [
+      "Award",
+      "Arduino"
+    ],
+    "desc": "Represented Gingoog City Comprehensive NHS at Christ the King College — secured 2nd Place out of 12 regional schools in a two-hour timed hardware programming build.",
+    "url": "#work",
+    "image": null,
+    "gradient": "linear-gradient(135deg,#ffd43b 0%,#f08c00 100%)",
+    "featured": false
   },
   {
-    id: 'blind-stick',
-    name: 'Smart Blind Stick',
-    tags: ['IoT', 'Accessibility'],
-    desc: 'IoT assistive device using ultrasonic sensors to detect obstacles up to two metres away, alerting the user through vibration and a buzzer. Battery-powered with low-power optimisation.',
-    url: '#work',
-    image: null,
-    gradient: 'linear-gradient(135deg,#20c997 0%,#099268 100%)',
-    featured: false,
-  },
+    "id": "blind-stick",
+    "name": "Smart Blind Stick",
+    "tags": [
+      "IoT",
+      "Accessibility"
+    ],
+    "desc": "IoT assistive device using ultrasonic sensors to detect obstacles up to two metres away, alerting the user through vibration and a buzzer. Battery-powered with low-power optimisation.",
+    "url": "#work",
+    "image": null,
+    "gradient": "linear-gradient(135deg,#20c997 0%,#099268 100%)",
+    "featured": false
+  }
 ]
