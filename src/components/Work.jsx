@@ -7,8 +7,16 @@ export default function Work() {
 
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem('portfolio_projects') || '[]')
-      if (saved.length) setProjects([...DEFAULT_PROJECTS, ...saved])
+      let stored = JSON.parse(localStorage.getItem('portfolio_projects') || 'null')
+      if (!stored) {
+        setProjects(DEFAULT_PROJECTS)
+      } else {
+        if (!stored.some(p => p.id === 'evecurls')) {
+          stored = [...DEFAULT_PROJECTS, ...stored]
+          localStorage.setItem('portfolio_projects', JSON.stringify(stored))
+        }
+        setProjects(stored)
+      }
     } catch {}
   }, [])
 

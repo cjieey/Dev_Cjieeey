@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import styles from './Admin.module.css'
+import { DEFAULT_PROJECTS } from '../data/projects'
 
 const STORAGE_KEY = 'portfolio_projects'
 const PASS = 'celjie2026' // simple client-side gate
@@ -17,7 +18,18 @@ export default function Admin() {
   const fileRef = useRef()
 
   useEffect(() => {
-    try { setProjects(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')) } catch {}
+    try {
+      let stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null')
+      if (!stored) {
+        setProjects(DEFAULT_PROJECTS)
+      } else {
+        if (!stored.some(p => p.id === 'evecurls')) {
+          stored = [...DEFAULT_PROJECTS, ...stored]
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(stored))
+        }
+        setProjects(stored)
+      }
+    } catch {}
   }, [])
 
   const save = (list) => {
@@ -143,9 +155,9 @@ export default function Admin() {
 
       {/* Project list */}
       <section className={styles.listSection}>
-        <h2>Custom Projects ({projects.length})</h2>
+        <h2>All Projects ({projects.length})</h2>
         {projects.length === 0
-          ? <p className={styles.empty}>No custom projects yet. Add one above.</p>
+          ? <p className={styles.empty}>No projects yet. Add one above.</p>
           : (
             <div className={styles.list}>
               {projects.map(p => (
