@@ -2,91 +2,164 @@ import { useRef, useEffect, useState } from 'react'
 import styles from './Hero.module.css'
 
 export default function Hero() {
-  const forgeRef = useRef(null)
-  const plateRef = useRef(null)
-  const canvasRef = useRef(null)
-  const stateRef = useRef({ tx:0,ty:0,cx:0,cy:0,tr:0,cr:0,raf:null,primed:false,particles:[],live:false })
+  const forgeRef   = useRef(null)
+  const plateRef   = useRef(null)
+  const canvasRef  = useRef(null)   // trail + ember sparks
+  const revealRef  = useRef(null)   // persistent reveal canvas (painted glow map)
+  const rebornRef  = useRef(null)   // the armoured image layer
   const [heroOpacity, setHeroOpacity] = useState(1)
 
   const radius = () => {
-    if (!plateRef.current) return 88
-    return Math.max(88, plateRef.current.clientWidth * 0.27)
+    if (!plateRef.current) return 100
+    return Math.max(100, plateRef.current.clientWidth * 0.30)
   }
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    const s = stateRef.current
+    const canvas  = canvasRef.current
+    const revCvs  = revealRef.current
+    if (!canvas || !revCvs) return
+
+    const ctx    = canvas.getContext('2d')
+    const revCtx = revCvs.getContext('2d')
+
     const reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches
 
+    // ── shared state ─────────────────────────────────────────────────
+    const s = {
+      tx:0, ty:0,        // raw pointer target
+      cx:0, cy:0,        // smoothed cursor
+      live: false,
+      primed: false,
+      raf: null,
+      // trail sparks
+      embers: [],
+      lastX:0, lastY:0,
+      // for fade loop even after leave
+      lastPaint: 0,
+    }
+
+    // ── resize both canvases ─────────────────────────────────────────
     const resize = () => {
       const dpr = window.devicePixelRatio || 1
-      canvas.width = canvas.clientWidth * dpr
-      canvas.height = canvas.clientHeight * dpr
+      ;[canvas, revCvs].forEach(c => {
+        c.width  = c.clientWidth  * dpr
+        c.height = c.clientHeight * dpr
+      })
       ctx.scale(dpr, dpr)
+      revCtx.scale(dpr, dpr)
     }
     resize()
     window.addEventListener('resize', resize)
 
-    const mkParticle = (x, y, isEmber) => isEmber
-      ? { x,y, vx:(Math.random()-.5)*2.4, vy:-Math.random()*2-1.2, size:Math.random()*2+1, alpha:1, decay:Math.random()*.025+.015, isEmber:true }
-      : { x,y, vx:(Math.random()-.5)*.9, vy:-Math.random()*.7-.4, size:Math.random()*16+10, growth:Math.random()*.25+.15, alpha:Math.random()*.22+.12, decay:Math.random()*.006+.004, rotation:Math.random()*Math.PI*2, rotationSpeed:(Math.random()-.5)*.012, isEmber:false }
-
-    const tick = () => {
-      s.cx += (s.tx - s.cx) * .16
-      s.cy += (s.ty - s.cy) * .16
-      s.cr += (s.tr - s.cr) * .12
-      if (forgeRef.current) {
-        forgeRef.current.style.setProperty('--rx', s.cx.toFixed(1) + 'px')
-        forgeRef.current.style.setProperty('--ry', s.cy.toFixed(1) + 'px')
-        forgeRef.current.style.setProperty('--rr', s.cr.toFixed(1) + 'px')
-      }
-      const w = canvas.clientWidth, h = canvas.clientHeight
-      ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.restore()
-      if (!reduce && (s.live || s.particles.length)) {
-        if (s.live) {
-          if (Math.random() < .4) s.particles.push(mkParticle(s.cx, s.cy, false))
-          if (Math.random() < .3) s.particles.push(mkParticle(s.cx, s.cy, true))
-        }
-        for (let i = s.particles.length - 1; i >= 0; i--) {
-          const p = s.particles[i]
-          p.x += p.vx; p.y += p.vy; p.alpha -= p.decay
-          if (!p.isEmber) { p.size += p.growth; p.rotation += p.rotationSpeed }
-          if (p.alpha <= 0) { s.particles.splice(i,1); continue }
-          ctx.save()
-          if (p.isEmber) {
-            ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2)
-            ctx.fillStyle = `rgba(217,1,1,${p.alpha})`
-            ctx.shadowColor = '#D90101'; ctx.shadowBlur = 6; ctx.fill()
-          } else {
-            ctx.translate(p.x,p.y); ctx.rotate(p.rotation)
-            const g = ctx.createRadialGradient(0,0,0,0,0,p.size)
-            g.addColorStop(0,`rgba(26,3,3,${p.alpha})`)
-            g.addColorStop(.3,`rgba(140,2,2,${p.alpha*.5})`)
-            g.addColorStop(1,'rgba(10,1,1,0)')
-            ctx.beginPath(); ctx.arc(0,0,p.size,0,Math.PI*2)
-            ctx.fillStyle = g; ctx.fill()
-          }
-          ctx.restore()
-        }
-      }
-      const moving = Math.hypot(s.tx-s.cx,s.ty-s.cy)>.4||Math.abs(s.tr-s.cr)>.4||s.particles.length>0
-      s.raf = moving ? requestAnimationFrame(tick) : null
+    // ── paint a glow blob onto the reveal canvas ─────────────────────
+    const paintReveal = (x, y, r) => {
+      const g = revCtx.createRadialGradient(x, y, 0, x, y, r)
+      g.addColorStop(0,    'rgba(255,255,255, 0.38)')
+      g.addColorStop(0.35, 'rgba(255,255,255, 0.22)')
+      g.addColorStop(0.65, 'rgba(255,255,255, 0.09)')
+      g.addColorStop(1,    'rgba(255,255,255, 0)')
+      revCtx.beginPath()
+      revCtx.arc(x, y, r, 0, Math.PI * 2)
+      revCtx.fillStyle = g
+      revCtx.fill()
     }
+
+    // ── spawn ember sparks ───────────────────────────────────────────
+    const spawnEmbers = (x, y) => {
+      const dist = Math.hypot(x - s.lastX, y - s.lastY)
+      if (dist < 5) return
+      s.lastX = x; s.lastY = y
+      const n = Math.floor(Math.random() * 3) + 1
+      for (let i = 0; i < n; i++) {
+        s.embers.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 3.2,
+          vy: -Math.random() * 2.8 - 0.8,
+          size:  Math.random() * 2.5 + 0.8,
+          alpha: Math.random() * 0.8 + 0.5,
+          decay: Math.random() * 0.028 + 0.018,
+        })
+      }
+    }
+
+    // ── main loop ────────────────────────────────────────────────────
+    const tick = () => {
+      // smooth cursor
+      s.cx += (s.tx - s.cx) * 0.18
+      s.cy += (s.ty - s.cy) * 0.18
+
+      // ---- reveal canvas: fade everything very slowly ----
+      // multiply-alpha trick: draw a semi-transparent dark rect over entire canvas
+      // this makes every painted pixel slowly dim toward 0
+      revCtx.save()
+      revCtx.setTransform(1,0,0,1,0,0)
+      revCtx.globalCompositeOperation = 'destination-in'
+      // 0.985 per frame @ 60fps ≈ full fade in ~4s
+      revCtx.fillStyle = 'rgba(0,0,0, 0.985)'
+      revCtx.fillRect(0, 0, revCvs.width, revCvs.height)
+      revCtx.restore()
+
+      // while hovering: continuously paint glow blobs at cursor
+      if (s.live) {
+        paintReveal(s.cx, s.cy, radius())
+        spawnEmbers(s.cx, s.cy)
+        s.lastPaint = Date.now()
+      }
+
+      // apply reveal canvas as the mask on .reborn via canvas-to-dataURL
+      // — but that's too slow. Instead we just show/hide .reborn via opacity
+      // and use the reveal canvas AS a CSS mask via object-url trick.
+      // Simplest cross-browser: use the reveal canvas pixels as a luminance mask
+      // by drawing it over .reborn using mix-blend-mode on the canvas element.
+
+      // ---- spark canvas: clear & draw embers ----
+      ctx.save()
+      ctx.setTransform(1,0,0,1,0,0)
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.restore()
+
+      for (let i = s.embers.length - 1; i >= 0; i--) {
+        const e = s.embers[i]
+        e.x += e.vx; e.y += e.vy
+        e.vy += 0.08
+        e.alpha -= e.decay
+        if (e.alpha <= 0) { s.embers.splice(i, 1); continue }
+        ctx.beginPath()
+        ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(255,120,30,${e.alpha.toFixed(3)})`
+        ctx.shadowColor = '#ff4400'
+        ctx.shadowBlur  = 10
+        ctx.fill()
+        ctx.shadowBlur  = 0
+      }
+
+      // keep loop alive while: hovering OR embers exist OR reveal still has pixels (recent paint)
+      const revealStillFading = Date.now() - s.lastPaint < 6000
+      const busy = s.live || s.embers.length > 0 || revealStillFading
+      s.raf = busy ? requestAnimationFrame(tick) : null
+    }
+
     const run = () => { if (!s.raf) s.raf = requestAnimationFrame(tick) }
 
+    // ── pointer events ───────────────────────────────────────────────
     const track = (e) => {
       if (!plateRef.current) return
       const r = plateRef.current.getBoundingClientRect()
-      s.tx = e.clientX - r.left; s.ty = e.clientY - r.top
-      if (!s.primed) { s.cx = s.tx; s.cy = s.ty; s.primed = true; resize() }
-      s.tr = radius(); s.live = true
+      s.tx = e.clientX - r.left
+      s.ty = e.clientY - r.top
+      if (!s.primed) {
+        s.cx = s.tx; s.cy = s.ty
+        s.lastX = s.tx; s.lastY = s.ty
+        s.primed = true; resize()
+      }
+      s.live = true
       if (forgeRef.current) forgeRef.current.classList.add(styles.live)
       run()
     }
+
     const release = () => {
-      s.tr = 0; s.live = false
+      s.live = false
+      s.lastPaint = Date.now() // start the 6s fade window
       if (forgeRef.current) forgeRef.current.classList.remove(styles.live)
       run()
     }
@@ -97,27 +170,28 @@ export default function Hero() {
     forge.addEventListener('pointerleave', release)
     forge.addEventListener('pointercancel', release)
 
-    // touch drift
+    // no-hover touch drift
     if (!window.matchMedia('(hover:hover)').matches && !reduce) {
       const t0 = Date.now()
       const drift = () => {
         if (!plateRef.current) return
-        const r = plateRef.current.getBoundingClientRect()
-        const sec = (Date.now()-t0)/2600
-        s.tx = r.width*(0.5+0.26*Math.sin(sec))
-        s.ty = r.height*(0.44+0.16*Math.cos(sec*.8))
-        if (!s.primed) { s.cx=s.tx; s.cy=s.ty; s.primed=true; resize() }
-        s.tr = radius(); s.live = true
+        const r   = plateRef.current.getBoundingClientRect()
+        const sec = (Date.now() - t0) / 2600
+        s.tx = r.width  * (0.5 + 0.26 * Math.sin(sec))
+        s.ty = r.height * (0.44 + 0.16 * Math.cos(sec * 0.8))
+        if (!s.primed) { s.cx=s.tx; s.cy=s.ty; s.lastX=s.tx; s.lastY=s.ty; s.primed=true; resize() }
+        s.live = true
         if (forgeRef.current) forgeRef.current.classList.add(styles.live)
-        run(); requestAnimationFrame(drift)
+        run()
+        requestAnimationFrame(drift)
       }
       requestAnimationFrame(drift)
     }
 
-    // hero fade on scroll
+    // scroll fade
     const onScroll = () => {
       const p = Math.min(window.scrollY / window.innerHeight, 1)
-      setHeroOpacity(+(1 - p * .85).toFixed(3))
+      setHeroOpacity(+(1 - p * 0.85).toFixed(3))
     }
     window.addEventListener('scroll', onScroll, { passive: true })
 
@@ -134,31 +208,40 @@ export default function Hero() {
 
   return (
     <header className={styles.hero} id="top" style={{ opacity: heroOpacity }}>
-
-      {/* Red radial atmosphere — always on hero root */}
       <div className={styles.field} aria-hidden="true" />
 
-      {/* Forge image */}
       <div className={styles.center}>
-        <div
-          className={styles.forge}
-          ref={forgeRef}
-          style={{ '--rx':'50%','--ry':'42%','--rr':'0px' }}
-        >
+        <div className={styles.forge} ref={forgeRef}>
           <div className={styles.plate} ref={plateRef}>
+
+            {/* greyscale base */}
             <div className={styles.ronin}>
               <img src="/samurai-ronin.webp" alt="Celjie Magbunag as samurai" fetchPriority="high" />
             </div>
-            <div className={styles.reborn} id="reborn">
-              <img src="/samurai-reborn.webp" alt="" aria-hidden="true" />
+
+            {/* coloured layer — reveal canvas is used as luminance mask */}
+            <div className={styles.rebornWrap} ref={rebornRef}>
+              <img
+                src="/samurai-reborn.webp"
+                alt=""
+                aria-hidden="true"
+                className={styles.rebornImg}
+              />
+              {/* reveal canvas sits on top of the coloured image, blend mode = destination-in mask */}
+              <canvas
+                ref={revealRef}
+                className={styles.revealCanvas}
+                aria-hidden="true"
+              />
             </div>
+
+            {/* ember sparks canvas */}
             <canvas className={styles.canvas} ref={canvasRef} aria-hidden="true" />
             <p className={styles.hint}>Move your cursor to forge the armour</p>
           </div>
         </div>
       </div>
 
-      {/* Text overlay — left / right flanking the image */}
       <div className={styles.grid}>
         <div className={styles.left}>
           <div className={styles.brand}>
@@ -187,7 +270,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Footer bar */}
       <div className={styles.footer}>
         <div className={styles.meta}>
           <span>Gingoog City, Philippines</span>
