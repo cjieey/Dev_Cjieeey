@@ -1,0 +1,91 @@
+.split {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1.25fr);
+  gap: clamp(2rem,6vw,5rem);
+  align-items: start;
+}
+@media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
+
+.grid2 { display: grid; gap: 1.1rem; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); }
+.grid4 { display: grid; gap: 1.1rem; grid-template-columns: repeat(auto-fit, minmax(228px,1fr)); }
+
+.panelHead {
+  font-family: var(--display); font-weight: 700; font-size: 1.06rem;
+  letter-spacing: .03em; margin-bottom: .9rem;
+  display: flex; align-items: center; gap: .6rem;
+}
+.panelHead::before { content: ''; width: 14px; height: 1px; background: var(--ember); flex: none; }
+
+/* Journey */
+.path { list-style: none; position: relative; padding-left: 2.3rem; }
+.path::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: var(--rule); }
+.path li { position: relative; padding: 0 0 2rem 0; }
+.path li:last-child { padding-bottom: 0; }
+.path li::before {
+  content: ''; position: absolute; left: -2.3rem; top: .5rem;
+  width: 15px; height: 15px; border-radius: 50%;
+  border: 1px solid var(--ember); background: var(--sumi);
+}
+.pathYr { font-family: var(--mono); font-size: .66rem; letter-spacing: .2em; text-transform: uppercase; color: var(--ember); display: block; margin-bottom: .3rem; }
+.pathWhat { font-family: var(--display); font-weight: 500; font-size: 1.08rem; line-height: 1.45; }
+.pathNote { color: var(--bone-faint); font-size: .9rem; }
+
+/* Experience */
+.role { border-top: 1px solid var(--rule); padding: 2.2rem 0; }
+.role:last-of-type { border-bottom: 1px solid var(--rule); }
+.roleTop { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .6rem 1.5rem; margin-bottom: .35rem; }
+.roleTitle { font-family: var(--display); font-weight: 700; font-size: clamp(1.2rem,2.6vw,1.7rem); line-height: 1.25; }
+.roleWhen { font-family: var(--mono); font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ember); white-space: nowrap; }
+.roleWhere { font-family: var(--mono); font-size: .72rem; letter-spacing: .1em; color: var(--bone-faint); margin-bottom: 1.1rem; }
+.roleBody { color: var(--bone-dim); max-width: 74ch; margin-bottom: 1.5rem; line-height: 1.85; }
+.roleBody strong { color: var(--bone); font-weight: 500; }
+.facts { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); margin-bottom: 1.4rem; }
+.fact { border-left: 1px solid var(--ember); padding-left: .9rem; }
+.fact b { display: block; font-weight: 500; font-size: .94rem; margin-bottom: .2rem; }
+.fact span { font-size: .86rem; color: var(--bone-faint); line-height: 1.6; }
+
+/* Contact */
+.contactSection { text-align: center; }
+.mailto {
+  display: inline-block; font-family: var(--display); font-weight: 700;
+  font-size: clamp(1.1rem,4vw,2.6rem); letter-spacing: -.01em;
+  border-bottom: 1px solid var(--rule); padding-bottom: .25rem;
+  transition: color .3s ease, border-color .3s ease; word-break: break-word;
+}
+.mailto:hover { color: var(--ember); border-color: var(--ember); }
+.ctaRow { display: flex; flex-wrap: wrap; gap: .8rem; justify-content: center; margin-top: 2.4rem; }
+
+.contactForm {
+  max-width: 540px; margin: 3rem auto 0; text-align: left;
+  display: grid; gap: 1rem;
+}
+.label {
+  display: block; font-family: var(--mono); font-size: .66rem;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--bone-faint); margin-bottom: .5rem;
+}
+.input {
+  width: 100%; background: rgba(232,220,200,.05); border: 1px solid var(--rule);
+  color: var(--bone); padding: .75rem 1rem; font-family: var(--body);
+  font-size: .95rem; outline: none; transition: border-color .25s ease;
+}
+.input:focus { border-color: var(--ember); }
+.formFooter { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; }
+.formStatus { font-family: var(--mono); font-size: .7rem; letter-spacing: .1em; color: #4ade80; }
+
+/* ===== MOBILE ===== */
+@media (max-width: 640px) {
+  .grid2, .grid4 { grid-template-columns: 1fr; }
+  .split { gap: 2rem; }
+
+  .facts { grid-template-columns: 1fr; }
+
+  .roleTop { flex-direction: column; gap: .3rem; align-items: flex-start; }
+  .roleTitle { font-size: 1.1rem; }
+
+  .ctaRow { flex-direction: column; align-items: center; }
+  .ctaRow .btn { width: 100%; justify-content: center; max-width: 320px; }
+
+  .contactForm { margin-top: 2rem; }
+
+  .mailto { font-size: clamp(1rem, 5vw, 1.6rem); }
+}

@@ -1,0 +1,315 @@
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: opacity .1s linear;
+}
+
+/* ---------- red radial atmosphere (always on .hero) ---------- */
+.field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    62% 52% at 50% 44%,
+    #D90101 0%, #B70101 26%, #8C0202 46%,
+    #4A0404 68%, #150202 86%, #0A0101 100%
+  );
+}
+.field::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 88% at 50% 44%, transparent 38%, rgba(10,1,1,.5) 74%, #0A0101 100%),
+    linear-gradient(180deg, transparent 62%, #0A0101 100%);
+}
+
+/* ---------- forge image (desktop: centred column, absolutely placed) ---------- */
+.center {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(300px, 50vw, 720px);
+  display: flex;
+  align-items: stretch;
+  pointer-events: none;
+  z-index: 2;
+}
+.forge {
+  position: relative;
+  width: 100%;
+  touch-action: none;
+  cursor: crosshair;
+  pointer-events: all;
+}
+.plate { position: absolute; inset: 0; }
+.ronin, .reborn { position: absolute; inset: 0; }
+.ronin img, .reborn img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.ronin img { filter: grayscale(.55) contrast(1.12) brightness(.82); }
+.reborn {
+  -webkit-mask-image: radial-gradient(circle var(--rr) at var(--rx) var(--ry), #000 22%, rgba(0,0,0,0) 100%);
+  mask-image:         radial-gradient(circle var(--rr) at var(--rx) var(--ry), #000 22%, rgba(0,0,0,0) 100%);
+}
+.reborn img { filter: contrast(1.06) saturate(1.12); }
+.canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 4; opacity: 0;
+  transition: opacity .4s ease;
+}
+.live .canvas { opacity: 1; }
+.hint {
+  position: absolute;
+  left: 50%; bottom: 5%;
+  transform: translateX(-50%);
+  font-family: var(--mono); font-size: .66rem;
+  letter-spacing: .24em; text-transform: uppercase;
+  color: var(--bone-faint); white-space: nowrap;
+  z-index: 5; transition: opacity .4s ease;
+}
+.live .hint { opacity: 0; }
+
+/* ---------- desktop text grid (3-col: text | image gap | text) ---------- */
+.grid {
+  position: relative;
+  z-index: 3;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,42%) minmax(0,1fr);
+  align-items: stretch;
+  padding-top: clamp(5rem, 10vh, 8rem);
+  padding-bottom: clamp(2rem, 4vh, 4rem);
+  pointer-events: none;
+}
+.left, .right { pointer-events: all; }
+.left {
+  grid-column: 1;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(4rem,8vh,7rem) 1vw 2rem clamp(1.2rem,4vw,4rem);
+}
+.brand { display: flex; flex-direction: column; align-items: flex-start; }
+.name {
+  font-family: 'Kurozen', 'Permanent Marker', cursive;
+  font-size: clamp(2rem, 4.5vw, 4.2rem);
+  color: #fff; line-height: .95; letter-spacing: .04em;
+  text-transform: uppercase; font-style: normal;
+  filter: drop-shadow(0 4px 12px rgba(10,1,1,.7));
+  white-space: nowrap;
+}
+.nameCeljie { transform: rotate(-6deg) translateY(.4rem); }
+.nameMag {
+  transform: rotate(-4deg) scale(.97) translateY(.3rem);
+  margin-top: .3rem; margin-left: 1.2rem;
+}
+.quote {
+  font-family: var(--display);
+  font-size: clamp(.8rem, 1.2vw, 1rem);
+  color: var(--bone-dim); line-height: 1.75;
+  font-style: italic; max-width: 22ch;
+}
+.right {
+  grid-column: 3;
+  display: flex; flex-direction: column;
+  justify-content: space-between; align-items: flex-start;
+  padding: clamp(4rem,8vh,7rem) clamp(1.2rem,4vw,4rem) 2rem 1vw;
+}
+.slogan {
+  font-family: 'Montserrat', var(--body), sans-serif;
+  font-weight: 900;
+  font-size: clamp(1.6rem, 3.4vw, 3.2rem);
+  line-height: 1; letter-spacing: -.01em;
+  color: #f2ece0; text-transform: uppercase;
+  text-shadow: 0 2px 16px rgba(10,1,1,.5);
+}
+
+/* ---------- sword button ---------- */
+.swordBtn {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 35px; text-decoration: none;
+  transition: transform .2s ease;
+}
+.swordBtn:hover { transform: scale(1.05) translateY(-2px); }
+.btnText {
+  position: relative; z-index: 2;
+  background: linear-gradient(180deg,#D90101 0%,#B70101 50%,#8C0202 100%);
+  color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 900;
+  font-size: 1.05rem; letter-spacing: .12em;
+  padding: .75rem 2.2rem; border-radius: 6px; border: 1px solid #700101;
+  box-shadow: 0 4px 0 #4a0404, 0 8px 16px rgba(10,1,1,.65), inset 0 1px 0 rgba(255,255,255,.3);
+  text-shadow: 0 2px 4px rgba(10,1,1,.4);
+}
+.hilt {
+  position: absolute; left: 0;
+  display: flex; align-items: center;
+  z-index: 1; transform: translateX(12px);
+}
+.hilt::before {
+  content: ''; width: 6px; height: 24px;
+  background: linear-gradient(to bottom,#f3e5ab,#d4af37,#aa7c11);
+  border: 1px solid #8a6409; border-radius: 3px; margin-right: -1px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.5);
+}
+.hilt::after {
+  content: ''; width: 32px; height: 10px;
+  background: repeating-linear-gradient(45deg,#d4af37 0,#d4af37 3px,#1a1303 3px,#1a1303 7px);
+  border: 1px solid #5a430a; border-radius: 0 2px 2px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,.5);
+}
+.blade {
+  position: absolute; right: 0;
+  width: 40px; height: 8px;
+  background: linear-gradient(to bottom,#fff 0%,#dcdcdc 30%,#a9a9a9 70%,#696969 100%);
+  border: 1px solid #808080; border-left: none;
+  z-index: 1; transform: translateX(-12px);
+  clip-path: polygon(0 0,72% 0,100% 50%,72% 100%,0 100%);
+  box-shadow: 0 2px 4px rgba(0,0,0,.5);
+}
+
+/* ---------- footer bar ---------- */
+.footer {
+  position: relative; z-index: 3;
+  padding: 1.2rem clamp(1.2rem,5vw,5rem);
+  display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: space-between; gap: 1rem;
+  border-top: 1px solid var(--rule);
+}
+.meta {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: .8rem 1.4rem;
+  font-family: var(--mono); font-size: .7rem;
+  letter-spacing: .12em; color: var(--bone-faint);
+}
+.pulse { display: inline-flex; align-items: center; gap: .5rem; color: var(--bone); }
+.pulse i {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: #4ade80; box-shadow: 0 0 0 0 rgba(74,222,128,.65);
+  animation: pulseAnim 2.4s infinite;
+}
+@keyframes pulseAnim {
+  70%  { box-shadow: 0 0 0 9px rgba(74,222,128,0); }
+  100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+}
+.cta { display: flex; flex-wrap: wrap; gap: .8rem; }
+
+/* ============================================================
+   MOBILE  ≤ 767px
+   Layout: image full-screen, text scrolls below the fold
+   ============================================================ */
+@media (max-width: 767px) {
+  /* Hero stretches to fit all content */
+  .hero {
+    min-height: 0;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* ---- image zone: one full screen ---- */
+  .center {
+    position: relative;
+    left: auto; top: auto; bottom: auto;
+    transform: none;
+    width: 100%;
+    height: 100svh;
+    pointer-events: all;
+    z-index: 1;
+    flex-shrink: 0;
+    display: block;
+  }
+  .forge { width: 100%; height: 100%; position: relative; }
+  .plate { position: absolute; inset: 0; }
+  .ronin img, .reborn img {
+    object-fit: cover;
+    object-position: center 8%;
+  }
+
+  /* field scoped to the image zone */
+  .field {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    transform: none;
+    background: radial-gradient(70% 60% at 50% 35%,#D90101 0%,#900101 36%,#3A0202 68%,#0A0101 100%);
+  }
+  .field::after {
+    background: linear-gradient(
+      180deg,
+      rgba(10,1,1,.1)  0%,
+      transparent      20%,
+      rgba(10,1,1,.55) 65%,
+      #0A0101          100%
+    );
+  }
+
+  /* ---- text zone: sits BELOW the image, plain dark bg ---- */
+  .grid {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    grid-template-columns: unset;
+    pointer-events: all;
+    padding: 1.8rem 1.4rem 0;
+    background: #0A0101;
+    /* top dark-to-dark bridge so image fades seamlessly into text bg */
+    box-shadow: 0 -60px 60px 40px #0A0101;
+  }
+  .left {
+    display: flex; flex-direction: column;
+    gap: .6rem; padding: 0; grid-column: unset;
+  }
+  .right {
+    display: flex; flex-direction: column;
+    gap: .9rem; padding: 0;
+    align-items: flex-start; grid-column: unset;
+  }
+
+  /* Name */
+  .name {
+    font-size: clamp(2.2rem, 11vw, 3.4rem);
+    white-space: normal; line-height: .93;
+    filter: drop-shadow(0 2px 6px rgba(10,1,1,.8));
+  }
+  .nameCeljie { transform: rotate(-4deg); }
+  .nameMag { transform: rotate(-2deg); margin-left: .45rem; margin-top: .15rem; }
+
+  .quote { font-size: .84rem; max-width: 30ch; }
+
+  .slogan {
+    font-size: clamp(1.4rem, 7vw, 2.2rem);
+    text-shadow: none;
+  }
+  .btnText { font-size: .88rem; padding: .62rem 1.7rem; }
+
+  /* footer below text */
+  .footer {
+    position: relative; z-index: 2;
+    background: #0A0101;
+    padding: 1rem 1.4rem 2rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .7rem;
+    border-top: 1px solid rgba(232,220,200,.1);
+    box-shadow: none;
+  }
+  .meta { font-size: .62rem; gap: .4rem .9rem; }
+  .cta { gap: .4rem; flex-wrap: wrap; }
+  .cta .btn { padding: .55rem .9rem; font-size: .6rem; }
+}

@@ -1,0 +1,126 @@
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1.5rem; padding: 1rem clamp(1rem,4vw,3rem);
+  backdrop-filter: blur(14px);
+  background: linear-gradient(180deg,rgba(10,1,1,.75),rgba(10,1,1,0));
+  transition: background .4s ease;
+}
+.solid {
+  background: rgba(10,1,1,.94);
+  border-bottom: 1px solid rgba(232,220,200,.1);
+}
+.mark {
+  font-family: var(--display); font-weight: 800; font-size: 1.05rem;
+  letter-spacing: .16em; display: flex; align-items: center; gap: .55rem;
+  white-space: nowrap; z-index: 101;
+}
+.seal {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid var(--ember);
+  display: grid; place-items: center;
+  font-size: .62rem; color: var(--ember);
+}
+
+/* Desktop nav links */
+.links {
+  display: flex; gap: 1.7rem; list-style: none;
+  font-family: var(--mono); font-size: .7rem;
+  letter-spacing: .14em; text-transform: uppercase;
+}
+.links a {
+  color: var(--bone-dim); transition: color .25s ease;
+  position: relative; padding-bottom: 3px;
+}
+.links a::after {
+  content: ''; position: absolute; left: 0; bottom: 0;
+  width: 100%; height: 1px; background: var(--ember);
+  transform: scaleX(0); transform-origin: left; transition: transform .3s ease;
+}
+.links a:hover { color: var(--bone); }
+.links a:hover::after { transform: scaleX(1); }
+.num { color: var(--ember); margin-right: .35rem; font-family: var(--display); }
+
+.right { display: flex; align-items: center; gap: .8rem; }
+.hireBtn { white-space: nowrap; }
+
+/* Burger — hidden on desktop */
+.burger {
+  display: none;
+  flex-direction: column; justify-content: center; gap: 5px;
+  width: 36px; height: 36px; padding: 6px;
+  background: rgba(232,220,200,.08);
+  border: 1px solid rgba(232,220,200,.15);
+  border-radius: 6px;
+  cursor: pointer; z-index: 101; flex-shrink: 0;
+}
+.burger span {
+  display: block; height: 2px; width: 100%;
+  background: var(--bone); border-radius: 2px;
+  transition: transform .28s ease, opacity .28s ease, width .28s ease;
+}
+.burgerOpen span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.burgerOpen span:nth-child(2) { opacity: 0; width: 0; }
+.burgerOpen span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ---- DRAWER ---- */
+.overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 98;
+  background: rgba(10,1,1,.6);
+  backdrop-filter: blur(4px);
+  opacity: 0; transition: opacity .3s ease;
+}
+.overlay.overlayOpen { opacity: 1; }
+
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 99;
+  width: min(280px, 80vw);
+  background: rgba(14,2,2,.97);
+  border-left: 1px solid rgba(232,220,200,.1);
+  display: flex; flex-direction: column;
+  padding: 4.5rem 1.8rem 2rem;
+  transform: translateX(100%);
+  transition: transform .32s cubic-bezier(.4,0,.2,1);
+  overflow-y: auto;
+}
+.drawer.drawerOpen { transform: translateX(0); }
+
+.drawerLinks {
+  list-style: none; display: flex; flex-direction: column; gap: 0;
+  font-family: var(--mono); font-size: .82rem;
+  letter-spacing: .14em; text-transform: uppercase;
+}
+.drawerLinks li { border-bottom: 1px solid rgba(232,220,200,.07); }
+.drawerLinks a {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .9rem 0; color: var(--bone-dim);
+  transition: color .2s ease, padding-left .2s ease;
+}
+.drawerLinks a:hover { color: var(--bone); padding-left: .4rem; }
+.drawerNum { color: var(--ember); font-family: var(--display); font-size: .95rem; }
+
+.drawerHire {
+  margin-top: 2rem;
+  display: block; text-align: center;
+  padding: .85rem; font-size: .72rem;
+}
+
+.drawerFooter {
+  margin-top: auto; padding-top: 1.5rem;
+  display: flex; gap: 1rem;
+  font-family: var(--mono); font-size: .62rem;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--bone-faint);
+  border-top: 1px solid rgba(232,220,200,.07);
+}
+.drawerFooter a:hover { color: var(--ember); }
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 860px) {
+  .links { display: none; }
+  .hireBtn { display: none; }
+  .burger { display: flex; }
+  .overlay { display: block; pointer-events: none; }
+  .overlay.overlayOpen { pointer-events: all; }
+}

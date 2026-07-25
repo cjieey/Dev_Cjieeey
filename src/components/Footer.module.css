@@ -1,0 +1,26 @@
+.foot {
+  border-top: 1px solid var(--rule);
+  padding: 2rem 0 2.4rem;
+  position: relative;
+}
+/* ember glow at bottom */
+.foot::before {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 60vh; z-index: -1;
+  background: radial-gradient(58% 100% at 50% 100%, rgba(217,1,1,.28) 0%, rgba(140,2,2,.12) 40%, transparent 78%);
+}
+.inner {
+  display: flex; flex-wrap: wrap; gap: 1rem;
+  justify-content: space-between; align-items: center;
+  font-family: var(--mono); font-size: .66rem;
+  letter-spacing: .14em; color: var(--bone-faint);
+}
+.links { display: flex; gap: 1.4rem; }
+.links a:hover { color: var(--bone); }
+
+/* Progress bar */
+#progress-bar {
+  position: fixed; left: 0; top: 0; width: 2px; height: 0%;
+  background: linear-gradient(180deg, var(--ember), var(--bone));
+  z-index: 60; transition: height .1s linear;
+}
