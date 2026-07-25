@@ -58,29 +58,11 @@
   object-position: top center;
 }
 .ronin img { filter: grayscale(.55) contrast(1.12) brightness(.82); }
-
-/* rebornWrap: clips the coloured layer + its mask canvas together */
-.rebornWrap {
-  position: absolute; inset: 0;
-  /* isolation so blend mode is scoped inside this element */
-  isolation: isolate;
-  overflow: hidden;
+.reborn {
+  -webkit-mask-image: radial-gradient(circle var(--rr) at var(--rx) var(--ry), #000 22%, rgba(0,0,0,0) 100%);
+  mask-image:         radial-gradient(circle var(--rr) at var(--rx) var(--ry), #000 22%, rgba(0,0,0,0) 100%);
 }
-.rebornImg {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: top center;
-  filter: contrast(1.06) saturate(1.12);
-}
-/* reveal canvas sits over the image; destination-in means only pixels
-   where this canvas is non-transparent will show through */
-.revealCanvas {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  mix-blend-mode: destination-in;
-  z-index: 2;
-}
+.reborn img { filter: contrast(1.06) saturate(1.12); }
 .canvas {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
