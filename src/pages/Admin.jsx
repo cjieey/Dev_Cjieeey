@@ -32,11 +32,18 @@ export default function Admin() {
     } catch {}
   }, [])
 
-  const save = (list) => {
+  const save = async (list) => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
       setProjects(list)
       setSaved(true); setTimeout(() => setSaved(false), 2000)
+
+      // Send to local vite server to write to source code
+      await fetch('/api/save-projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(list)
+      })
     } catch (e) {
       alert("Error saving: Storage limit reached! The image might be too large.")
       console.error(e)
