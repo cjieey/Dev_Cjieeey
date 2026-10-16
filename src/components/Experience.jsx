@@ -35,7 +35,7 @@ export default function Experience() {
         <article className={`${styles.role} reveal`} style={{ '--d': '160ms' }}>
           <div className={styles.roleTop}>
             <h3 className={styles.roleTitle}>Software Developer Intern</h3>
-            <span className={styles.roleWhen}>2025 — Present</span>
+            <span className={styles.roleWhen}>2025 — 2026</span>
           </div>
           <p className={styles.roleWhere}>Local Civil Registrar's Office (LCRO) · Gingoog City · On-site</p>
           <p className={styles.roleBody}>
